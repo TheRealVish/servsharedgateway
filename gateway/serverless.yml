@@ -1,0 +1,50 @@
+service: shared3-apigateway
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-2
+  # resourcePolicy:
+  #   Effect: Deny
+  #   NotPrincipal:
+  #     AWS: arn:aws:sts::800868885046:assumed-role/sharedgwroleapi3/sharedgwrolesess
+  #   Action: execute-api:Invoke
+  #   Resource: '*'
+resources:
+  Resources:
+    SharedGWapi3:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: SharedGWapi3
+    BatchResultsTPRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: sharedgwroleapi3
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+            - Effect: Allow
+              Principal:
+                AWS: arn:aws:iam::687348962219:root
+              Action: sts:AssumeRole
+              Condition:
+                StringLike:
+                  sts:RoleSessionName: sharedgwrolesess
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+  Outputs:
+    apiGatewayRestApiId:
+      Value:
+        Ref: SharedGWapi3
+      Export:
+        Name: SharedGWapi3-restApiId
+    apiGatewayRestApiRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - SharedGWapi3
+          - RootResourceId
+      Export:
+        Name: SharedGWapi3-rootResourceId

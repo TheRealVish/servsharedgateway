@@ -1,0 +1,17 @@
+service: eshop1-transactions
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-2
+  apiGateway:
+    restApiId:
+      "Fn::ImportValue": SharedGWapi-restApiId
+    restApiRootResourceId:
+      "Fn::ImportValue": SharedGWapi-rootResourceId
+functions:
+  get-transactions:
+    handler: handler.getTransactions
+    events:
+      - http:
+          path: transactions/list
+          method: get
